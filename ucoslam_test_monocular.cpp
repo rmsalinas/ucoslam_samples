@@ -38,6 +38,7 @@ int main(int argc,char **argv){
 
         //creates an empty map
         std::shared_ptr<ucoslam::Map> map=std::make_shared<ucoslam::Map>();
+        //map->loadFromFile(pathToFile);
         //open video
         VideoIn.open(argv[1]);
         if(!VideoIn.isOpened()) throw std::runtime_error("Could not open video:"+string(argv[1]));

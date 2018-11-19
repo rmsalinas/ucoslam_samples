@@ -47,23 +47,20 @@ void createMapWithLeft(string videoFile,string cameraparamsfile,string vocfilepa
         SLAM.process(im,cameraParams,i);
         cout<<"processing ..."<<i<<endl;
     }
-    //let us compress the map removing unused key points
+    //let us compress the map removing unused key points [optional]
     map->removeUnUsedKeyPoints();
     //save the map
     map->saveToFile(outputmap);
 }
 
 
-void showTrackingResultsWithRightCamera(string videoFile,string cameraparamsfile){
-
-}
 int main(int argc,char **argv){
 
     try {
 
         if(argc!=3) throw std::runtime_error("dirToKittiDataSet orb.fbow");
 
-        string mapName="dirToKittiDataSet/kitti00_left.map";
+        string mapName=argv[1]+string("/kitti00_left.map");
         createMapWithLeft(argv[1]+string("/cam0.mp4"),argv[1]+string("/cam0.yml"),argv[2],mapName);
 
 
@@ -95,20 +92,18 @@ int main(int argc,char **argv){
             cv::Mat pose=SLAM.process(image,cameraParams,videoCap.get(CV_CAP_PROP_POS_FRAMES));
             key=Viewer.show(map,image,pose);
 
-            if( key=='f'){//move the video forward 10 frames
+            if( key=='i'){//move the video forward 10 frames
                 int pos=videoCap.get(CV_CAP_PROP_POS_FRAMES);
                 pos=std::min( pos+10,int(videoCap.get(CV_CAP_PROP_FRAME_COUNT)-1));
                 videoCap.set(CV_CAP_PROP_POS_FRAMES,pos);
             }
-            if( key=='b'){//moves the video bacwards 10 frames
+            if( key=='u'){//moves the video backwards 10 frames
                 int pos=videoCap.get(CV_CAP_PROP_POS_FRAMES);
-                pos=std::max( pos+10,0);
+                pos=std::max( pos-10,0);
                 videoCap.set(CV_CAP_PROP_POS_FRAMES,pos);
             }
 
         }
-
-
     } catch (std::exception &ex) {
         std::cerr<<ex.what()<<std::endl;
     }

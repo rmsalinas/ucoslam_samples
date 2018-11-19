@@ -16,4 +16,5 @@ LINK_LIBRARIES(${OpenCV_LIBS}  ${ucoslam_LIBS} )
 ADD_EXECUTABLE(ucoslam_test_monocular ucoslam_test_monocular.cpp)
 ADD_EXECUTABLE(ucoslam_test_stereo ucoslam_test_stereo.cpp)
 ADD_EXECUTABLE(ucoslam_test_left_right ucoslam_test_left_right.cpp)
+ADD_EXECUTABLE(ucoslam_test_mapiterator ucoslam_test_mapiterator.cpp)
 

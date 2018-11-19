@@ -25,6 +25,7 @@
 #include <iostream>
 #include "ucoslam/ucoslam.h"
 #include "ucoslam/mapviewer.h"
+#include "ucoslam/basictypes/timers.h"
 using namespace std;
 
 void createMapWithLeft(string videoFile,string cameraparamsfile,string vocfilepath,string outputmap ){
@@ -87,9 +88,13 @@ int main(int argc,char **argv){
         //process until ESC
         char key=0;
         cv::Mat image;
+        ucoslam::TimerAvrg Timer;//compute the fps
         while(videoCap.grab() && key!=27){
             videoCap.read(image);
+            Timer.start();
             cv::Mat pose=SLAM.process(image,cameraParams,videoCap.get(CV_CAP_PROP_POS_FRAMES));
+            Timer.stop();
+            cout<<"FPS="<<1./Timer.getAvrg()<<endl;
             key=Viewer.show(map,image,pose);
 
             if( key=='i'){//move the video forward 10 frames

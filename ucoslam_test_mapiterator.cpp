@@ -43,6 +43,22 @@ int main(int argc,char **argv){
                cout<<" at the pixel:"<<pixel<<endl;
             }
         }
+        //the same in a C++98 style
+        for(size_t i=0; Map->map_points.capacity();i++){
+            if( Map->map_points.is(i)){//check if valid
+                const ucoslam::MapPoint  &point=Map->map_points[i];
+                cout<<"Map Point:"<<point.id<<" pos="<<point.getCoordinates()<<endl;
+                cout<<" Is observed in:"<<endl;
+                for(auto _pair:point.getObservingFrames()){
+                    cout<<"     Frame idx="<<_pair.first<<" keypoint: "<<_pair.second;
+                    //print the keypoint 2d position
+                    cv::Point2f pixel=Map->keyframes[ _pair.first ].und_kpts[ _pair.second].pt;
+                    cout<<" at the pixel:"<<pixel<<endl;
+                }
+            }
+        }
+
+
 
     } catch (std::exception &ex) {
      cout<<   ex.what()<<endl;

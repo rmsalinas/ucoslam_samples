@@ -43,8 +43,11 @@ int main(int argc,char **argv){
                cout<<" at the pixel:"<<pixel<<endl;
             }
         }
+
+        cout<<"/////////////////////////////////////////////////"<<endl;
+
         //the same in a C++98 style
-        for(size_t i=0; Map->map_points.capacity();i++){
+        for(uint32_t i=0;i< Map->map_points.capacity();i++){
             if( Map->map_points.is(i)){//check if valid
                 const ucoslam::MapPoint  &point=Map->map_points[i];
                 cout<<"Map Point:"<<point.id<<" pos="<<point.getCoordinates()<<endl;
@@ -58,7 +61,20 @@ int main(int argc,char **argv){
             }
         }
 
+        cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<endl;
+        //now, we do it the other way around. Iterate in KeyFrames, and acess to MapPoints
+         for(const auto &Kframe:Map->keyframes){
+            cout<<"Frame "<<Kframe.idx<<" is at "<< Kframe.getCameraCenter()<< endl;
+            cout<<"The frame observes the following MapPoints:"<<endl;
+            //iterate through the ids.
+            for(size_t i=0;i<Kframe.ids.size();i++){
+                if(  Kframe.ids[i]!=std::numeric_limits<uint32_t>::max()){
+                    uint32_t mapId=Kframe.ids[i];
+                    cout<<"\tMapPoint.id="<< mapId<<" 3D position="<<Map->map_points[ mapId].getCoordinates()<<endl;
+                }
+            }
 
+        }
 
     } catch (std::exception &ex) {
      cout<<   ex.what()<<endl;

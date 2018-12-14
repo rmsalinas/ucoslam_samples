@@ -26,27 +26,29 @@
 #include <iostream>
 #include <ucoslam/ucoslam.h>
 #include <ucoslam/mapviewer.h>
+#include <ucoslam/stereorectify.h>
 using namespace std;
 
 int main(int argc, char* argv[]){
     try {
         if(argc!=6)
             throw std::runtime_error("Usage: <video1> <video2> <stereo_calibration_file>  <voc_file> <outmap.map>");
-        ucoslam::ImageParams image_params;
-        cv::VideoCapture video[2];
+
+        ucoslam::StereoRectify StRect;
+         cv::VideoCapture video[2];
         ucoslam::UcoSlam system;
         ucoslam::MapViewer mv;
         std::shared_ptr<ucoslam::Map> map=make_shared<ucoslam::Map>();
 
 
-        image_params.readFromXMLFile(argv[3]);
+        StRect.readFromXMLFile(argv[3]);
         for(int i=0;i<2;i++){
             video[i].open(argv[i+1]);
             if(!video[i].isOpened())
                 throw runtime_error(string("Cannot open video file at:")+argv[i+1]);
         }
 
-        //prepare params for Kitti
+        //prepare params to run sequentially and do not neeed to detect markers
         ucoslam::Params sparams;
         sparams.detectMarkers=false;
         sparams.runSequential=true;//this disables parrallel mapping to avoid skipping frames
@@ -55,13 +57,16 @@ int main(int argc, char* argv[]){
         //configure the system priving the map, the operation params, and the vocabulary file (optional)
         system.setParams(map,sparams,argv[4]);
         char key=0;
-        cv::Mat rectified_image[2];
+        cv::Mat input_image[2];
         while( video[0].grab() && video[1].grab() && key!=27){
+            //read images
             for(int i=0;i<2;i++)
-                video[i].retrieve(rectified_image[i]);
+                video[i].retrieve(input_image[i]);
+
+            StRect.rectify(input_image[0],input_image[1]);//rectify the input images
             int frameNumber=video[0].get(CV_CAP_PROP_POS_FRAMES);
-            cv::Mat pose=system.processStereo(rectified_image[0],rectified_image[1],image_params,frameNumber );
-            key=mv.show(map,rectified_image[0],pose);
+            cv::Mat pose=system.processStereo(StRect.getLeft(),StRect.getRight(),StRect.getImageParams(),frameNumber );
+            key=mv.show(map,StRect.getLeft(),pose);
         }
 
         //finally, save the map
